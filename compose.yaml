@@ -1,0 +1,100 @@
+
+services:
+  app:
+    build:
+      context: .
+      target: app
+    container_name: boot-app
+    volumes:
+      - ./src:/var/www/html
+    working_dir: /var/www/html
+    
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - ./src/.env
+    networks:
+      - boot-net
+    restart: unless-stopped
+
+  web:
+    image: nginx:stable-alpine
+    container_name: boot-web
+    ports:
+      - 8000:80
+    volumes:
+      - ./src:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - boot-net
+    restart: unless-stopped
+  db:
+    image: postgres:16-alpine
+    container_name: boot-db
+    environment:
+      POSTGRES_DB: bootcamp
+      POSTGRES_USER: bootuser
+      POSTGRES_PASSWORD: bootpass
+    ports:
+      - 5432:5432
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - boot-net
+    restart: unless-stopped
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: boot-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: secret
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    ports:
+      - 5050:80
+    depends_on:
+      - db
+    networks:
+      - boot-net
+    restart: unless-stopped
+  redis:
+    image: redis:7-alpine
+    container_name: boot-redis
+    environment:
+      REDIS_PASSWORD: redispass
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    networks:
+      - boot-net
+    restart: unless-stopped
+  vite:
+    image: node:18-slim
+    container_name: boot-vite
+    working_dir: /var/www/html
+    volumes:
+      - ./src:/var/www/html
+    command: sh -c "npm install && npm run dev -- --host"
+    ports:
+      - 5173:5173
+    depends_on:
+      - app
+    networks:
+      - boot-net
+    restart: unless-stopped
+networks:
+  boot-net:
+    driver: bridge
+volumes:
+  db-data:
+  pgadmin-data:
+  # server:
+  #   build:
+  #     context: .
+  #   ports:
+  #     - 9000:80
+
+
+
