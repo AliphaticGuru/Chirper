@@ -26,23 +26,25 @@ WORKDIR /var/www/html/
 ARG COMPOSER_AUTH
 ENV COMPOSER_AUTH=$COMPOSER_AUTH
 
-# ENV PORT=10000
-ENV APP_ENV=production
-ENV APP_DEBUG=false
+ENV PORT=10000
+# ENV APP_ENV=production
+# ENV APP_DEBUG=false
 ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV COMPOSER_MEMORY_LIMIT=-1
 
 USER root
 
 # Install nginx
-RUN apk add --no-cache \
+RUN apk add --no-cache nginx gettext \
     git \
     unzip \
     icu-dev \
     oniguruma-dev \
-    libzip-dev 
+    libzip-dev \
+    && mkdir -p /etc/nginx/http.d \
+    && mkdir -p /run/nginx
 
-# RUN sed -i 's/^;*clear_env\s*=.*/clear_env = no/' /usr/local/etc/php-fpm.d/www.conf    
+RUN sed -i 's/^;*clear_env\s*=.*/clear_env = no/' /usr/local/etc/php-fpm.d/www.conf    
 
 # Copy app
 COPY ./src/ /var/www/html/
@@ -58,19 +60,17 @@ RUN composer install \
     --no-progress
 
 # Copy nginx config
-# COPY nginx/default.conf.template /etc/nginx/default.conf.template
+COPY nginx/default.conf.template /etc/nginx/default.conf.template
 
 
 # Laravel permissions
 RUN chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
-EXPOSE 9000  
+EXPOSE 10000  
 
-CMD ["php-fpm"]
-
-# CMD sh -c "\
-#     php-fpm & \
-#     envsubst '\$PORT' < /etc/nginx/default.conf.template > /etc/nginx/http.d/default.conf && \
-#     nginx -g 'daemon off;' \
-# "
+CMD sh -c "\
+    php-fpm & \
+    envsubst '\$PORT' < /etc/nginx/default.conf.template > /etc/nginx/http.d/default.conf && \
+    nginx -g 'daemon off;' \
+"
