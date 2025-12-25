@@ -73,4 +73,4 @@ CMD ["php-fpm"]
 #     php-fpm & \
 #     envsubst '\$PORT' < /etc/nginx/default.conf.template > /etc/nginx/http.d/default.conf && \
 #     nginx -g 'daemon off;' \
-"
+# "
