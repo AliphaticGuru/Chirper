@@ -71,7 +71,7 @@ services:
       - boot-net
     restart: unless-stopped
   vite:
-    image: node:18-slim
+    image: node:lts-alpine3.23
     container_name: boot-vite
     working_dir: /var/www/html
     volumes:
