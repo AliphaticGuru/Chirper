@@ -1,19 +1,15 @@
 <?php
 
+use App\Http\Controllers\ChirpController;
 use Illuminate\Support\Facades\Route;
+
 
 Route::get('/welcome', function () {
     return view('welcome');
 });
 
-Route::get('/', function () {
-    return view('home');
-});
+Route::get('/', [ChirpController::class, 'index']);
 
-Route::get('/home', function () {
-    return view('home');
-});
+Route::get('/home', [ChirpController::class, 'index']);
 
-Route::get('/about', function () {
-    return view('about');
-});
+Route::get('/about', [ChirpController::class, 'about']);
