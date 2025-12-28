@@ -71,15 +71,7 @@ RUN chown -R www-data:www-data storage bootstrap/cache \
 EXPOSE 10000  
 
 CMD sh -c "\
-    php artisan migrate --force && \
     php-fpm & \
     envsubst '\$PORT' < /etc/nginx/default.conf.template > /etc/nginx/http.d/default.conf && \
     nginx -g 'daemon off;' \
 "
-
-
-# CMD sh -c "\
-#     php-fpm & \
-#     envsubst '\$PORT' < /etc/nginx/default.conf.template > /etc/nginx/http.d/default.conf && \
-#     nginx -g 'daemon off;' \
-# "
