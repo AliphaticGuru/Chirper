@@ -13,8 +13,8 @@
 FROM node:lts-alpine3.23 AS vite
 
 WORKDIR /app
-COPY src/package*.json ./
-RUN npm install
+COPY src/package*.json src/package-lock.json ./
+RUN npm ci
 COPY src/ .
 RUN npm run build
 
@@ -65,8 +65,8 @@ COPY nginx/default.conf.template /etc/nginx/default.conf.template
 
 
 # Laravel permissions
-RUN chown -R www-data:www-data storage bootstrap/cache \
-    && chmod -R 775 storage bootstrap/cache
+RUN chown -R www-data:www-data storage bootstrap/cache public/build \
+    && chmod -R 775 storage bootstrap/cache public/build
 
 EXPOSE 10000  
 
