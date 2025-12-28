@@ -9,7 +9,8 @@
 
 
 # ---------- Vite build ----------
-FROM node:20-alpine AS vite
+# FROM node:20-alpine AS vite
+FROM node:lts-alpine3.23 AS vite
 
 WORKDIR /app
 COPY src/package*.json ./
